@@ -1,4 +1,5 @@
 import os
+import certifi
 from motor.motor_asyncio import AsyncIOMotorClient
 from dotenv import load_dotenv
 
@@ -15,14 +16,14 @@ class MongoDBManager:
         uri = os.getenv("MONGO_V1_URI") or os.getenv("MONGO_URI")
         if not uri:
             raise ValueError("MONGO_V1_URI or MONGO_URI not found in .env")
-        return AsyncIOMotorClient(uri)
+        return AsyncIOMotorClient(uri, tlsCAFile=certifi.where())
 
     @staticmethod
     def get_v2_client():
         uri = os.getenv("MONGO_V2_URI")
         if not uri:
             raise ValueError("MONGO_V2_URI not found in .env")
-        return AsyncIOMotorClient(uri)
+        return AsyncIOMotorClient(uri, tlsCAFile=certifi.where())
 
     @staticmethod
     def get_v1_db():
@@ -69,7 +70,7 @@ class MongoDBManager:
             uri = os.getenv("MONGO_V2_URI")
             if not uri:
                  raise ValueError("MONGO_V3_URI or MONGO_V2_URI not found in .env")
-        return AsyncIOMotorClient(uri)
+        return AsyncIOMotorClient(uri, tlsCAFile=certifi.where())
 
     @staticmethod
     def get_v3_db():
