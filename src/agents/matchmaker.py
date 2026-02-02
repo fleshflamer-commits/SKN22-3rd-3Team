@@ -76,7 +76,7 @@ async def matchmaker_node(state: AgentState) -> Command:
 {query}
 
 [선정 원칙]
-1. 단순 조회(LOOKUP)일 경우 질문한 품종을 최우선으로 찾으세요.
+1. 단순 조회(LOOKUP)일 경우 질문한 품종을 최우선으로 찾으세요. **만약 후보 리스트에 질문한 품종이 명확히 없다면, 억지로 비슷한 것을 선택하지 말고 빈 리스트([])를 반환하세요.**
 2. 추천(RECOMMEND)일 경우 알레르기/거주환경을 엄격히 고려하세요.
 
 [후보 리스트]
@@ -95,6 +95,26 @@ async def matchmaker_node(state: AgentState) -> Command:
     # 5. 상위 3건 필터링
     final_indices = selection.selected_indices[:3]
     top_results = [raw_results[i] for i in final_indices if i < len(raw_results)]
+
+    # 품종을 못 찾은 경우 (Empty Selection)
+    if not top_results and intent.category == "LOOKUP":
+        print(f"🕵️ [MATCHMAKER] Unknown breed requested: {query}")
+        return Command(
+            update={
+                "specialist_result": {
+                    "source": "matchmaker",
+                    "type": "breed_recommendation",
+                    "specialist_name": "매치메이커 비서",
+                    "persona": persona, 
+                    "user_context": context,
+                    "rag_context": "검색 결과에 해당 품종이 존재하지 않습니다.", # Head Butler가 이를 인지하고 CASE 3("모른다냥")로 대응하도록 유도
+                    "rag_docs": []
+                },
+                "recommendations": [],
+                "rag_docs": [],
+            },
+            goto="head_butler"
+        )
 
     # 선별된 품종 정보를 집사용으로 압축
     rag_context = ""

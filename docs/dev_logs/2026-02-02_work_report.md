@@ -53,6 +53,7 @@
     - 사용자의 질문이 **단순 조회(LOOKUP)**인지 **추천 요청(RECOMMEND)**인지 먼저 판단하는 로직 추가.
     - LOOKUP: 사용자 프로필(거주환경 등)을 검색어에서 배제하여 "메인쿤" 등 특정 품종 검색 시 왜곡 방지.
     - RECOMMEND: 기존처럼 사용자 프로필을 반영하여 맞춤형 추천.
+    - SEARCH: **[CASE 3] 미등록 품종 대응** 추가. Selector가 빈 리스트를 반환하면 "해당 품종이 없습니다" 시그널을 보내, Head Butler가 "모르는 고양이다냥"으로 답변하도록 유도.
 - **[core/models/matchmaker.py](../../src/core/models/matchmaker.py)** (신규):
     - `SearchIntent` 및 `BreedSelection` DTO를 별도 파일로 분리하여 관리.
 
