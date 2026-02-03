@@ -1,12 +1,12 @@
-# 🏰 ZIPSA: AI-Powered Cat Head Butler Service
+# 🏰 ZIPSA: AI-Powered Cat Head Butler
 > **"Every Butler Needs a Head Butler."**
-> **Agentic RAG-based Lifestyle Matching & Comprehensive Care System**
+> 집사들을 위한 반려묘 입양 및 케어 지원 챗봇
 
 ---
 
 ## 1. Project Vision (비전)
 **ZIPSA(집사)**는 초보 및 예비 '집사(고양이 반려인)'를 위한 **AI 수석 집사 서비스**입니다.
-사용자의 라이프스타일을 심층 분석하여 가장 적합한 묘종을 추천하고(Matching), 입양 절차를 안내하며(Liaison), 입양 후에는 다중묘 갈등 조정부터 건강 관리까지(Care) 전방위로 지원하는 **'Agentic RAG' 기반의 코칭 시스템**입니다. 단순한 챗봇을 넘어, 전문성을 가진 **전문가 팀(Specialist Agents)**이 협업하여 사용자의 고민을 해결합니다.
+사용자의 라이프스타일과 환경을 심층 분석하여 가장 적합한 묘종을 추천하고(Matching), 입양 절차를 안내하며(Liaison), 입양 후에는 **반려묘 간의 관계 개선(Peacekeeper)부터 건강 관리(Physician) 등 케어까지** 전방위로 지원하는 것을 목표로 하는 **'Agentic RAG' 기반의 코칭 시스템**입니다. 단순한 챗봇을 넘어, 전문성을 가진 **전문가 팀(Specialists)**이 협업하여 사용자의 고민을 해결합니다.
 
 ---
 
@@ -23,9 +23,9 @@
 - **구조동물 조회**: 국가동물보호정보시스템 API를 통해 보호 중인 고양이 정보를 실시간 조회.
 - **보호소 연계**: 지역별 보호소 정보 및 연락처 안내.
 
-### ⚖️ 3. Conflict Resolution (다묘 갈등 조정)
-- **성향 분석**: 기존 반려묘와 새로운 반려묘의 MBTI(성격 유형) 분석.
-- **합사 솔루션**: 단계별 합사 스케줄링 및 긴장 완화(Peacekeeping) 프로토콜 제공.
+### ⚖️ 3. Conflict Resolution (반려묘 간 관계 개선)
+- **행동/심리 상담**: 분리불안, 공격성 등 문제 행동에 대한 행동학적 원인 및 솔루션 제공.
+- **합사 가이드**: 다중묘 가정을 위한 단계별 합사 요령 및 스트레스 관리법 안내.
 
 ### 🩺 4. Lifecycle Care (생애주기 케어)
 - **건강 모니터링**: 구토, 배변 등 이상 징후 발생 시 초기 대응 가이드(Triage) 제공.
@@ -63,6 +63,9 @@ Head Butler가 유일한 Exit Point이며, 전문가 노드는 구조화 JSON(`s
 본 프로젝트는 **LangGraph 기반 4-Node Agent System** 패턴을 채택했습니다.
 
 - **Orchestration**: `LangGraph`를 이용한 상태 관리(Stateful) 및 에이전트 라우팅. Head Butler가 유일한 Exit Point.
+- **Dual-Model Strategy (Cost Optimization)**:
+  - **Router (`gpt-4.1-nano`)**: 의도 분류 및 구조화된 판단(JSON) 전용. 초경량/고비용 효율.
+  - **Basic (`gpt-4o-mini`)**: 텍스트 요약(RAG Context Distillation) 및 최종 응답 생성.
 - **Knowledge Base (RAG)**:
     - **Vector Store**: MongoDB Atlas Vector Search (`cat_library`).
     - **Retrieval**: Hybrid Search (Vector + Keyword/BM25 + RRF Re-ranking + Dynamic Metadata Filtering).
