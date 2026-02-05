@@ -183,10 +183,20 @@ streamlit run src/ui/app.py
 ## 8. 문서 인덱스 (Index)
 프로젝트에 대한 더 자세한 내용은 `docs/` 디렉토리의 아래 문서들을 참고하세요.
 
+### 📜 협업 가이드 (Collaboration)
+- **[01. Coding Convention](docs/03_convention_and_guides/01_coding_convention.md)**: 코드 스타일 및 컨벤션
+- **[02. Git Process](docs/03_convention_and_guides/02_git_process.md)**: 브랜치 전략 및 커밋 규칙
+- **[03. PR Guide](docs/03_convention_and_guides/03_pr_guide.md)**: PR 템플릿 및 리뷰 프로세스
+- **[04. Env & Secrets](docs/03_convention_and_guides/04_env_secrets.md)**: 환경변수 및 보안 가이드
+
+### 🏗️ 아키텍처 (Architecture)
+- **[01. Project Structure](docs/02_system_architecture/01_structure.md)**: 디렉토리 구조 설명
+- **[02. LangGraph Architecture](docs/02_system_architecture/02_langgraph_arch.md)**: 에이전트 그래프 상세 설계
+
+### 📁 기타 문서
 - **[docs/01_project/overview.md](docs/01_project/overview.md)**: 프로젝트 개요 및 상세 기획
-- **[docs/01_project/architecture_graph.md](docs/01_project/architecture_graph.md)**: 시스템 아키텍처 다이어그램
-- **[docs/report/checklist.md](docs/report/checklist.md)**: 프로젝트 진행 상황 체크리스트
-- **[docs/report/roadmap_backlog.md](docs/report/roadmap_backlog.md)**: 향후 로드맵 및 백로그
+- **[docs/07_report/checklist.md](docs/07_report/checklist.md)**: 프로젝트 진행 상황 체크리스트
+- **[docs/07_report/roadmap_backlog.md](docs/07_report/roadmap_backlog.md)**: 향후 로드맵 및 백로그
 
 ---
 
