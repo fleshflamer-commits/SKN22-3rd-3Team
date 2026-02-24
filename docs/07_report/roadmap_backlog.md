@@ -5,92 +5,97 @@
 
 ---
 
-## 🚀 Phase 1: V3 안정화 및 버그 박멸 (Current)
-> **목표**: 현재 구현된 기능(Dual-Model, V3 검색, 3-Node 에이전트)의 무결성 확보 및 데이터 신뢰도 향상.
+## 🚀 Phase 1: 데이터 파이프라인 고도화 및 시스템 통합 검증 (Current)
+> **목표**: 고품질 원시 데이터 확보, 3-Node 에이전트 시스템의 무결성 검증.
 
-- [x] **지역 코드 정합성 검증 및 중복 제거** (`region_codes.py`)
-    - 이슈: `창원시` 등의 코드가 API에서 중복 반환되는 현상.
-    - 결과: 데이터 중복 제거 및 무결성 확인 완료.
-- [x] **스트리밍 토큰 필터링 및 보안 검증**
-    - 이슈: `head_butler`의 라우팅용 JSON 토큰이 사용자에게 노출될 위험.
-    - 결과: `astream_events` 핸들러 내 `router_classification` 태그 차단 검증 완료.
-- [ ] **통합 테스트 시나리오 설계 및 실행**
-    - **Plan**: 에이전트별 Happy/Bad Path, 멀티턴 대화 등을 포함한 상세 시나리오 문서(`test_plan.md`) 작성.
-    - **Execution (필수 시나리오)**:
-        - `Liaison` (유기묘):
-        - **Tool**: 위치/상태 기반 유기묘 조회 결과 제시.
-        - **RAG**: "입양 절차", "준비물" 등 가이드 정보 함께 제공 (Hybrid Response).
-    - `Matchmaker` (품종): 사용자 성향 기반 매칭 및 정보 제공 로직 검증.
-    - *Note*: 두 에이전트의 목적과 UX가 섞이지 않도록 엄격히 분리 테스트 수행.
-- [ ] **공공데이터 품종 코드 매핑 테이블 구축**
-    - 이슈: API의 `kindNm` 비표준 포맷(e.g., "[고양이] 한국 고양이") 대응.
-    - 액션: `kindCd` -> 표준 품종명 변환 테이블 확보.
-- [ ] **데이터셋 확장 및 V3 스키마 검증**
-    - 액션: 보호소 상세 정보, 수의학적 기초 데이터 등 고품질 소스 발굴 및 통합.
-    - **Critical**: V3 파이프라인 스키마 규격 엄수 (Schema Validation 필수).
-    - **Discussion**: **멀티모달 데이터 수용**을 위한 **V4 스키마 설계 및 벡터 차원 호환성 팀 논의** 선행 필요.
-
----
-
-## 🎨 Phase 2: UI/UX 고도화 & 개인화 (Next)
-> **목표**: 현대적인 Frontend 기술(React/Vue) 도입 및 회원가입 기반의 개인화 서비스 구축.
-
-### 2.1 Frontend Modernization
-- [ ] **Next.js 프론트엔드 아키텍처 설계**
-    - 검토: Streamlit 제거 후 **Next.js** 도입 시의 API 명세(FastAPI) 및 상태 관리 전략 수립.
-    - **Decision**: 업계 표준인 **Next.js (React)** 로 확정. Vercel AI SDK 등 최신 AI 생태계와의 최적 호환성 고려.
-    - 액션: Backend API(FastAPI/Django)와 Frontend 분리 아키텍처 수립.
-- [ ] **카드형 UI 컴포넌트 개발 (유기묘/추천 결과)**
-    - 목표: 텍스트 위주 정보를 시각적 카드(이미지, 핵심 태그, 요약) 형태로 변환.
-    - 액션: `st.container` (단기) -> React Component (장기) 전환.
-    - **Dependency**: 2.2의 **CatCard DTO 구조 개편**과 스키마 동기화 필수.
-
-### 2.2 Auth & Personalization
-- [ ] **회원가입/로그인 및 프로필 통합 시스템 구축**
-    - **API & DTO**: `UserCreate` (가입 요청), `UserResponse` (응답) 등 요청/응답 스키마 분리.
-    - **DB Schema**: MongoDB `users` 컬렉션 설계 (알레르기, 주거형태, 닉네임 등).
-    - **Onboarding**: 기존 `onboarding.py` 로직을 가입 후 프로필 설정 단계로 이관.
-- [ ] **CatCard DTO 구조 개편 및 상속 설계**
-    - 목표: 유기동물(`Abandoned`), 품종추천(`Recommend`), **사용자 반려묘(`UserCat`)** 의 공통 속성 통합.
-    - 구조: `BaseCatCard` (공통) -> `RecommendCard` / `AbandonedCard` / **`UserCatCard`** 상속.
-    - **One-to-Many**: 사용자 1명이 N마리의 고양이를 등록/관리할 수 있는 스키마 및 UI 설계.
-    - 기능: **Interactive Text** (LLM 응답 내 고양이 이름 호버 시 카드 팝오버 노출).
-
-### 2.3 Search Logic Enhancement
+- [ ] **데이터셋 수집 및 원시 데이터 확보**
+    - 액션: 보호소 상세 정보, 수의학적 기초 데이터 등 고품질 소스 발굴 및 수집.
+- [ ] **V3 스키마 검증 및 데이터 정제**
+    - 수집된 데이터를 바탕으로 V3 파이프라인 스키마 규격 엄수 (Schema Validation 필수).
 - [ ] **자연어 필터링 정책 고도화 (Breed Filtering Policy)**
     - 목표: 사용자의 자연어 표현을 숫자로 된 데이터 필터로 정확히 변환.
     - **Draft Policy (예시)**:
         - *Shedding*: "털 안 빠지는" -> `shedding_level <= 2`
         - *Energy*: "얌전한/아파트용" -> `energy_level <= 2`, "활발한" -> `energy_level >= 4`
         - *Friendly*: "초보/아이 있는 집" -> `child_friendly >= 4`
+- [ ] **통합 테스트 시나리오 설계 및 실행**
+    - **Plan**: 에이전트별 Happy/Bad Path, 멀티턴 대화 등을 포함한 상세 시나리오 문서(`test_plan.md`) 작성.
+    - **Execution (필수 시나리오 예시)**:
+        - `Liaison` (유기묘): "서울에 있는 렉돌 유기묘 알아봐줘. 입양 주의점도 알려줘." (Tool + RAG Hybrid 응답 검증)
+        - `Matchmaker` (품종): "혼자 사는데 외로움 많이 타는 개냥이 추천해줘." (모순된 요구사항에 대한 논리적 추론 및 대안 제시 검증)
+        - `Defense` (예외 처리): 프롬프트 인젝션 방어 및 제공 불가능한 서비스 정중한 거절.
+    - *Note*: 두 에이전트의 목적과 UX가 섞이지 않도록 엄격히 분리 테스트 수행.
 
 ---
 
-## 🏗️ Phase 3: 확장 및 자동화 (Future)
-> **목표**: 운영 효율성 증대, 인프라 안정화(DevOps) 및 AI 기능 확장.
+## 🎨 Phase 2: Full-Stack 아키텍처 구축 및 개인화 (Next.js + FastAPI)
+> **목표**: 통합 API 서버(FastAPI)와 현대적인 Frontend(Next.js)를 동시에 구축하여, 회원가입 기반의 개인화 서비스 및 UI/UX 완성.
 
-### 3.1 Backend & Infrastructure
-- [ ] **FastAPI 기반 백엔드 서버 구축**
-    - `LangServe`를 활용하여 에이전트 그래프(`graph.py`)를 REST API로 서빙.
-    - **Context Management**: 턴당/세션당 최대 토큰 제한(`max_tokens`) 및 대화 히스토리 Trimming 로직 구현 (안정성 확보).
-- [ ] **도커(Docker) 컨테이너 환경 구축**
-    - App + DB + Redis 구성을 `docker-compose`로 컨테이너화하여 환경 일관성 보장.
-- [ ] **GitHub Actions 기반 CI/CD 파이프라인 구축**
-    - GitHub Actions: PR 시 테스트(`pytest`) -> Main 병합 시 자동 배포.
-- [ ] **클라우드 배포 (AWS/GCP)**
-    - AWS/GCP 인스턴스 프로비저닝 및 실서버 배포.
+### 2.1 Architecture & Interface Specification
+- [ ] **통합 인터페이스 및 프론트/백엔드 명세서 정의**
+    - **API 명세서**: FastAPI 통신을 위한 RESTful Endpoint(URL, Request/Response 스키마 등) 규칙 설계 및 문서화.
+    - **Page 명세서**: Next.js App Router 기반의 페이지 경로(Routes), 화면별 요구사항, 상태 관리 흐름 정의.
+- [ ] **FastAPI 기반 백엔드 단일 모노리스 서버 구축**
+    - **서빙**: `LangServe`를 활용하여 에이전트 그래프(`graph.py`)를 즉시 통신 가능한 REST API로 서빙.
+    - **Context Management**: 턴당/세션당 최대 토큰 제한(`max_tokens`) 및 대화 히스토리 Trimming 로직 선행 구현 (안정성 확보).
+    - **Caching**: 반복 쿼리에 대한 응답 속도 최적화를 위해 Redis 캐싱 로직 선행 구현 적용.
+- [ ] **Next.js ↔ FastAPI 인터페이스 통합 전략 수립**
+    - 검토: Streamlit 제거 후 **Next.js** (Frontend) 연동 통신, 에러 핸들링, 및 상태 관리 전략 수립.
+    - **Decision**: 업계 표준인 **Next.js (React)** 로 프론트엔드 확정. Vercel AI SDK 등 최신 AI 생태계와의 최적 호환성 고려.
+- [ ] **백엔드: 통합 User DB 스키마 및 핵심 Entity 설계**
+    - **DB Schema**: MongoDB `users` 컬렉션 설계 (가입일, 최근 접속일, 로그인 정보 등).
+    - **API & DTO**: 기존 `user_profile.py`의 제약 조건/선호도 데이터를 `preferences` 속성으로 흡수하는 **통합 User DTO** 설계.
+    - **Relations**: 1:N 구조 (사용자 1명 -> N마리의 `UserCat`, N개의 `ChatSession`) 연동 스키마 확립.
+
+### 2.2 Global Auth & Onboarding Flow
+- [ ] **프론트엔드: NextAuth.js 기반 SSO 인증 아키텍처 연동**
+    - **SSO Login**: 프론트엔드 **NextAuth.js**가 전담하며, **Google, 카카오, 네이버** 기반 소셜 로그인으로 구현.
+    - **Backend Sync**: 프론트에서 소셜 로그인 인증을 통과시킨 유저의 식별자를 백엔드(FastAPI)로 전달하여 DB와 동기화하는 로직 연결.
+- [ ] **프론트엔드: 신규 유저 온보딩(Onboarding) 프로필 설정 UI**
+    - **Forms**: 기존 터미널 기반 `onboarding.py` 기능을 웹 폼으로 전환 (주거형태, 알레르기 등 수집).
+    - **Integration**: 수집된 초기 프로필 정보를 백엔드의 `User Entity` 규격에 맞게 전송(PATCH)하여 프로필 완성.
+
+### 2.3 Core App UI & Components
+- [ ] **통합 CatCard UI 컴포넌트 설계 및 DTO 개편**
+    - **Modeling**: 유기동물(`Abandoned`), 품종추천(`Recommend`), **사용자 반려묘(`UserCat`)** 데이터의 공통 속성 통합 (`BaseCatCard` 상속 구조).
+    - **UI Definition**: 텍스트 위주 정보를 시각적 카드(이미지, 핵심 태그, 요약) 형태로 변환하기 위한 공통 React Component 설계.
+    - **Interactive Text**: LLM 응답 내 고양이 이름 호버 시 해당 Data Model과 연동된 카드 팝오버 노출 기능.
+- [ ] **채팅 세션(Chat History) DTO 및 사이드바 UI 설계**
+    - **DB Schema**: `ChatSession`(방)과 `ChatMessage`(메시지 내역) 계층 구조 설계 (MongoDB).
+    - **API & DTO**: `SessionListResponse` (과거 대화 목록), `SessionDetailResponse` (특정 대화 내역 전체 로드) 명세 작성.
+    - **UI Definition**: 과거 대화 내역 사이드바(Drawer) 및 라우팅(`chat/[id]`) 기능을 갖춘 레이아웃 컴포넌트 개발.
+
+### 2.4 Viral Marketing & User Hook
+- [ ] **멀티모달 (Vision) 확장: '건방진 냥심 번역기' (Meme Generator) 단독 페이지 개발**
+    - **Separate Page**: 챗봇 내부가 아닌, 바이럴 및 유저 유입(Hook)을 위한 **독립된 웹 페이지(`/meme` 등)** 로 기획.
+    - **Vision AI**: 사용자가 업로드한 고양이 사진(표정, 자세, 주변 상황)을 분석하여 도도하고 시니컬한 고양이 시점의 유머러스한 텍스트(속마음) 생성.
+    - **UI/UX**: 인스타그램 스토리 등에 공유하기 좋은 '폴라로이드 짤(Meme)' 형태의 이미지+텍스트 합성 결과물 렌더링.
+    - **Profile Integration (1-Click)**: 결과물 하단에 **"이 건방진 냥이를 내 프로필(`UserCat`)에 등록할까요?"** 버튼을 배치하여, 자연스럽게 회원가입 및 반려묘 DTO 데이터 완성 유도 (대표 사진 1장과 이때 생성된 유머러스한 밈 텍스트를 함께 DB에 저장/덮어쓰기).
+
+---
+
+## 🏗️ Phase 3: 운영 환경 구축 및 보안 안정화 (Launch Ops)
+> **목표**: 실제 유저 오픈(MVP Launch)을 대비한 무중단 인프라, 보안 고도화 및 서비스 안정성 확보.
+
+### 3.1 Infrastructure & Deployment
+- [ ] **도커(Docker) 컨테이너 분리 환경 구축**
+    - **Containerization**: App(FastAPI) + Redis 컨테이너화 (`docker-compose`).
+    - **DB (MongoDB)**: Vector Search 기능 사용을 위해 로컬 컨테이너 대신 **클라우드(MongoDB Atlas)** 연동 구성 유지.
+    - **Redis 사용처**: (1) 대화 세션별 Memory(대화 이력) 빠른 읽기/쓰기 캐싱, (2) Rate Limiting(트래픽 제어) 상태 저장소.
+- [ ] **클라우드 실서버 배포 (OCI - Oracle Cloud Infrastructure)**
+    - RAM 용량(최소 2GB 이상 요구) 확보를 위해 AWS 프리티어 대신 **OCI Always Free (ARM Ampere A1)** 인스턴스 프로비저닝.
+    - 도커 이미지를 ARM 아키텍처에 맞게 빌드 및 실서버 배포 실행.
+- [ ] **GitHub Actions 기반 CI/CD 파이프라인 자동화**
+    - **CI Flow**: 새로운 PR 생성 시 모든 테스트(`pytest`) 모듈 자동 수행.
+    - **CD Flow**: `Main` 병합 시 OCI 서버에 변경사항 자동 빌드 및 배포 트리거 동작.
 
 ### 3.2 Data & AI Ops
-- [ ] **LangSmith 기반 KPI 자동 측정 시스템 도입**
-    - 답변 정확도, 응답 속도 등 품질 지표 모니터링 대시보드 구축.
-- [ ] **Redis 캐싱 시스템 도입**
-    - 반복되는 쿼리에 대한 응답 속도 개선.
-- [ ] **멀티모달 (Vision) 확장 기능 구현**
-    - 사용자가 업로드한 고양이 사진을 분석하여 품종 판별 및 상담.
-    - **Prerequisite**: Phase 1의 **V4 스키마 설계 및 벡터 차원 호환성** 논의 완료 필수.
-    - **인프라 고려사항**: 이미지 저장 및 벡터 검색을 위한 별도 스토리지 및 인덱싱 전략 필요.
+- [ ] **LangSmith 기반 KPI 운영 대시보드 구축 및 모니터링**
+    - Phase 2 개발 기간 동안 쌓인 로그를 바탕으로 E2E Latency, Token Usage(기본값+20% 룰), Error Rate 등 본격적인 서비스 운영 KPI 추적 대시보드 완성.
+- [ ] **Routing Accuracy 자동 테스트셋 정교화**
+    - 라우터의 의도 파악 및 분기 정확도(95% 이상 목표)를 정기적으로 검증하는 커스텀 데이터셋(`pytest` 연동) 구축.
 
-### 3.3 Security & Ops (New)
+### 3.3 Security & Ops
 - [ ] **개인정보 보호(PII) 마스킹 처리 구현**
     - **PII Masking**: LangSmith 전송 전 민감정보(전화번호, 주소 등) 마스킹 처리 (Privacy).
 - [ ] **트래픽 관리 및 레이트 리미팅(Rate Limiting) 적용**
@@ -102,10 +107,21 @@
 
 ---
 
-## 🛠️ Continuous Improvement (기술 부채)
-- [ ] **단위 테스트(Unit Test) 작성 및 커버리지 확보**
-- [ ] **RAG 태그 정합성 전수 조사 및 검증**
-    - DB 태그와 에이전트 라우팅 키워드(`care_team.py`) 일치 여부 전수 조사.
+## 🚀 Phase 4: 커뮤니티 확장 및 플랫폼화 (Future Vision)
+> **목표**: 서비스 안착 및 트래픽 수익화 이후, 고양이 사진 기록을 중심으로 한 소셜 플랫폼('캣스타그램')으로의 Pivoting 및 대규모 구조 개편
+
+### 4.1 Social Features & Storage Scaling
+- [ ] **'캣스타그램' 기반 사진 누적 아카이빙 (List[Photo]) 스키마 마이그레이션**
+    - **Data Migration**: 초기 1마리 1대표사진 정책(덮어쓰기)에서 탈피하여, `UserCat` 내 다중 사진(Meme 포함) 히스토리를 시계열로 누적 저장하는 `List[Photo]` 구조로 확장.
+    - **Infrastructure Requirement**: 막대한 이미지 클라우드(AWS S3) 스토리지 비용을 감당할 수 있는 트래픽 수익(BM) 구조가 마련된 이후 실행.
 
 ---
-**Last Updated**: 2026-02-05
+
+## 🛠️ Continuous Improvement (운영 유지보수)
+- [ ] **핵심 로직 테스트 코드 의무화 정책 수행**
+    - 통합 테스트뿐 아니라, 각 에이전트의 노드 함수(`def matchmaker_node(...)` 등) 단위에서 입출력 검증(`pytest`)을 70% 이상 달성.
+- [ ] **DB-에이전트 태그 싱크로나이저 자동화 배치 (Scripting)**
+    - MongoDB 실제 데이터 내에 존재하는 태그 목록과 `care_team.py` 등에서 라우터가 식별하는 하드코딩 태그 리스트 간 불일치(Mismatch)를 매일 1회 체크하여 경고를 띄우는 자동 검증 봇 로직 작성.
+
+---
+**Last Updated**: 2026-02-24

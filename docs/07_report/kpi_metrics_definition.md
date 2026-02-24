@@ -1,75 +1,41 @@
-# 📊 ZIPSA KPI & Evaluation Metrics
+# 📊 ZIPSA KPI & Evaluation Metrics (Simplified)
 
-프로젝트의 성과 및 AI 모델의 품질을 정량적으로 측정하기 위한 핵심 지표(KPI) 정의서입니다.
-LangSmith 등의 도구를 통해 자동 측정되며, 지속적인 모니터링 대상입니다.
+프로젝트의 성과 및 AI 에이전트의 품질을 실용적으로 측정하기 위한 **핵심 필수 지표(KPI) 정의서**입니다.
+복잡한 자동 평가보다는, **시스템의 안정성(속도/에러)과 실제 유저 만족도**를 최우선으로 모니터링합니다.
 
 ---
 
-## 1. Performance Metrics (성능 지표)
-시스템의 응답성과 안정성을 측정합니다.
+## 1. Performance Metrics (시스템 성능 및 안정성)
+시스템이 얼마나 빠르고 정확하게, 에러 없이 응답하는지를 측정하는 최우선 지표입니다.
 
 | Metric | Definition | Target Goal | Measurement |
 | :--- | :--- | :--- | :--- |
-| **E2E Latency** | 사용자 질문 후 첫 번째 토큰이 생성되기까지 걸리는 시간 (TTFT) 및 전체 완료 시간. | TTFT < 1.5s<br>Total < 5s | Streamlit `st.session_state` 타임스탬프 기록 |
-| **Error Rate** | 전체 요청 중 예외(Exception)나 타임아웃이 발생한 비율. | < 1% | Log Error Count / Total Requests |
-| **Routing Accuracy** | 사용자의 의도(Intent)에 맞게 올바른 에이전트(`Liaison`/`Matchmaker`)로 라우팅된 비율. | > 95% | LangSmith Tracer (Actual vs Expected) |
+| **E2E Latency** | 사용자 질문 접수 후, 최종 답변이 UI에 렌더링 완료되기까지 걸리는 총 소요 시간. | Avg < 5s | 로그 타임스탬프 (또는 LangSmith API 소요 시간) |
+| **Error Rate** | 전체 요청 중 시스템 에러(500)나 LLM 연결 타임아웃이 발생한 비율. | < 1% | Server Error Log Count / Total Requests |
+| **Routing Accuracy** | 사용자의 의도를 파악하여 올바른 에이전트(`Liaison`/`Matchmaker`)로 연결한 정확도. | > 95% | (Phase 3) LangSmith 오프라인 평가(Evaluator) |
 
 ---
 
-## 2. Cost & Efficiency Metrics (비용/효율)
-운영 비용을 최적화하기 위한 지표입니다.
+## 2. Cost Control Metrics (비용 통제)
+프롬프트가 비대해지거나 예기치 않은 토큰 낭비를 방어하기 위한 감시 지표입니다.
 
 | Metric | Definition | Target Goal | Measurement |
 | :--- | :--- | :--- | :--- |
-| **Token Usage** | 요청(Turn) 당 소비되는 평균 Input/Output 토큰 수. | Avg < 1k tokens | OpenAI Usage API Response |
-| **Cost per Turn** | 대화 한 턴당 발생하는 비용 (USD). | < $0.01 | Token Count * Model Unit Price |
-| **Cache Hit Rate** | 동일/유사 질문에 대해 Redis 캐시가 응답한 비율. | > 30% | Redis Hits / Total Queries |
+| **Token Usage** | 대화 한 턴(Turn)당 소비되는 평균 Input/Output 토큰 수. | **초기 측정된 기본 베이스라인(Baseline) + 20% 이내 유지** | LangSmith Usage Stats |
+
+*   **측정 가이드:** 
+    *   초기 알파 테스트 시나리오를 통해 RAG 검색 결과 텍스트와 시스템 프롬프트가 합쳐진 **기본 토큰량(Baseline)**을 먼저 측정합니다.
+    *   이후 운영 중에 평균 사용량이 **Baseline 대비 20% 이상 급등(Anomaly)**하는 경우 경고로 간주합니다.
+    *   이는 주로 대화 히스토리(Memory) 누적이나 너무 많은/큰 RAG 검색 결과 주입으로 인해 발생하는 "문맥 과부하(Context Overload)"를 감지하고 수정하기 위함입니다.
 
 ---
 
-## 3. Quality Validation Metrics (품질 지표)
-LLM의 답변 품질을 평가합니다. (LLM-as-a-Judge 활용)
-
-| Metric | Definition | Evaluation Method |
-| :--- | :--- | :--- |
-| **Faithfulness** | 답변이 검색된 문서(Context/RAG)의 내용에 **충실한가?** (환각 여부) | Ragas / LangSmith Evaluator |
-| **Answer Relevance** | 답변이 사용자의 질문(Query)에 **적절하게 대답했는가?** | Ragas / LangSmith Evaluator |
-| **Context Precsion** | 검색된 문서들이 질문과 **얼마나 관련성이 높은가?** (Retriever 성능) | Ragas / LangSmith Evaluator |
-
----
-
-## 4. User Experience Metrics (사용자 경험)
-실제 사용자의 만족도를 측정합니다.
+## 3. User Experience Metrics (사용자 경험)
+실제 서비스를 사용하는 유저가 체감하는 챗봇의 품질입니다.
 
 | Metric | Definition | Measurement |
 | :--- | :--- | :--- |
-| **Feedback Score** | 답변에 대한 좋아요(👍)/싫어요(👎) 비율. | UI Feedback Widget Data |
-| **Session Length** | 사용자가 이탈하지 않고 대화를 이어가는 평균 턴 수. | Avg Turns per SessionID |
+| **Feedback Score** | 챗봇의 각 응답 하단에 달린 좋아요(👍) 및 싫어요(👎) 클릭 비율. | UI Feedback Widget Data -> LangSmith Client 전송 |
 
----
-
-## 5. Implementation Strategy (구현 시나리오)
-
-지표를 측정하기 위해 별도의 대시보드를 직접 개발하는 것은 **비효율적(Over-engineering)** 입니다.
-초기에는 **LangSmith**의 내장 기능을 100% 활용하는 것을 권장합니다.
-
-### 5.1 Feedback Collection Flow (좋아요/싫어요)
-1.  **UI (Next.js/Streamlit)**: 답변 하단에 👍/👎 버튼 배치.
-2.  **Action**: 사용자가 버튼 클릭 시, 해당 답변의 `run_id`와 `score` (1 or 0)를 API로 전송.
-3.  **Backend**: LangSmith Client를 통해 피드백 등록.
-    ```python
-    langsmith.client.create_feedback(
-        run_id=answer_run_id,
-        key="user_score",
-        score=1.0  # or 0.0
-    )
-    ```
-4.  **Dashboard**: LangSmith 대시보드에서 자동으로 User Score 통계 시각화됨. (직접 개발 X)
-
-### 5.2 Session Metrics (턴 수 측정)
-1.  **Trace Grouping**: 모든 에이전트 호출 시 `session_id`를 LangSmith Tracer에 태깅.
-2.  **Analytics**: LangSmith가 `session_id` 기준으로 자동으로 그룹핑하여 **평균 세션 길이(Token/Wards)** 를 계산해줌.
-
-### 5.3 Custom Dashboard 필요성?
-*   **Phase 1~3**: **불필요 (Not Essential)**. LangSmith 기본 대시보드로 충분함.
-*   **Phase 4**: 비즈니스 팀이 SaaS 형태로 보고 싶어할 때, 그때 가서 Retool이나 Grafana로 연동 고려.
+*   **구현 방향:** 복잡한 LLM-as-a-Judge 자동 품질 평가(Ragas 등) 대신, 초기에는 가장 직관적이고 정확한 **실제 유저 피드백(User Score 1.0 or 0.0)** 수집 기능 개발에 집중합니다.
+*   **활용:** 싫어요(👎)를 연달아 받은 대화 세션의 로그를 추출하여 프롬프트를 개선하는 '주간 피드백 루프' 운영에 사용합니다.
